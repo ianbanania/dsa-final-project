@@ -524,43 +524,705 @@ print()
             6: {
                 title: "Hash Tables, Collisions, & Rehashing",
                 code: `# Topic 6: Hash Tables, Collisions, & Rehashing
-# ==== WRITE YOUR CODE HERE ====
+class HashTable:
+    def __init__(self, size=5):
+        self.size = size
+        self.count = 0
+        self.table = [None] * size
+
+    def hash_function(self, key):
+        return sum(ord(char) for char in str(key)) % self.size
+
+    # Insert with collision handling
+    def insert(self, key, value):
+        if (self.count + 1) / self.size > 0.7:
+            self.rehash()
+
+        index = self.hash_function(key)
+
+        while self.table[index] is not None:
+            if self.table[index][0] == key:
+                self.table[index] = (key, value)
+                return
+            index = (index + 1) % self.size
+
+        self.table[index] = (key, value)
+        self.count += 1
+
+    # Search for a value
+    def search(self, key):
+        index = self.hash_function(key)
+
+        for _ in range(self.size):
+            item = self.table[index]
+
+            if item is None:
+                return None
+
+            if item[0] == key:
+                return item[1]
+
+            index = (index + 1) % self.size
+
+        return None
+
+    # Increase table size
+    def rehash(self):
+        old_table = self.table
+
+        self.size = self.size * 2 + 1
+        self.table = [None] * self.size
+        self.count = 0
+
+        for item in old_table:
+            if item is not None:
+                self.insert(item[0], item[1])
+
+    # Display hash table
+    def display(self):
+        print("\\n=== HASH TABLE ===")
+
+        for index, item in enumerate(self.table):
+            print(index, ":", item)
+
+
+# Create hash table
+garden = HashTable()
+
+garden.insert("Water", 100)
+garden.insert("Seeds", 50)
+garden.insert("Fertilizer", 25)
+garden.insert("Tools", 10)
+garden.insert("Coins", 200)
+
+garden.display()
+
+print("\\nSearch Water:", garden.search("Water"))
+print("Search Seeds:", garden.search("Seeds"))
+
+print("\\nTotal Items:", garden.count)
+
+# Time Complexity:
+# Insert/Search: O(1) average, O(n) worst
+# Rehashing: O(n)
+
+# Space Complexity: O(n)
 `
             },
             7: {
                 title: "Graph Foundations, Adjacency Matrices/Lists, & DFS/BFS",
                 code: `# Topic 7: Graph Foundations, Adjacency Matrices/Lists, & DFS/BFS
-# ==== WRITE YOUR CODE HERE ====
+class GardenGraph:
+    def __init__(self):
+        self.graph = {}
+
+    # Add a location
+    def add_location(self, location):
+        if location not in self.graph:
+            self.graph[location] = []
+
+    # Connect two locations
+    def add_connection(self, a, b):
+        self.add_location(a)
+        self.add_location(b)
+
+        self.graph[a].append(b)
+        self.graph[b].append(a)
+
+    # Display adjacency list
+    def show_list(self):
+        print("\\n=== ADJACENCY LIST ===")
+
+        for location, neighbors in self.graph.items():
+            print(location, "->", neighbors)
+
+    # Display adjacency matrix
+    def show_matrix(self):
+        nodes = list(self.graph.keys())
+
+        print("\\n=== ADJACENCY MATRIX ===")
+        print("   ", nodes)
+
+        for a in nodes:
+            row = []
+
+            for b in nodes:
+                row.append(1 if b in self.graph[a] else 0)
+
+            print(a, row)
+
+    # Breadth-First Search
+    def bfs(self, start):
+        visited = set()
+        queue = deque([start])
+
+        print("\\nBFS Traversal:")
+
+        while queue:
+            current = queue.popleft()
+
+            if current not in visited:
+                print(current, end=" ")
+                visited.add(current)
+
+                for neighbor in self.graph[current]:
+                    if neighbor not in visited:
+                        queue.append(neighbor)
+
+    # Depth-First Search
+    def dfs(self, start, visited=None):
+        if visited is None:
+            visited = set()
+            print("\\nDFS Traversal:")
+
+        if start not in self.graph or start in visited:
+            return
+
+        print(start, end=" ")
+        visited.add(start)
+
+        for neighbor in self.graph[start]:
+            self.dfs(neighbor, visited)
+
+
+# Create garden map
+garden = GardenGraph()
+
+garden.add_connection("House", "Farm")
+garden.add_connection("House", "Well")
+garden.add_connection("Farm", "Greenhouse")
+garden.add_connection("Well", "Greenhouse")
+garden.add_connection("Greenhouse", "Storage")
+
+garden.show_list()
+garden.show_matrix()
+
+garden.bfs("House")
+garden.dfs("House")
+
+print("\\n")
+
+# Time Complexity:
+# BFS: O(V + E)
+# DFS: O(V + E)
+# Adjacency Matrix: O(V^2) space
+# Adjacency List: O(V + E) space
 `
             },
             8: {
                 title: "Sorting Algorithms (Bubble, Insertion, Selection, Quick, & Merge Sort)",
                 code: `# Topic 8: Sorting Algorithms (Bubble, Insertion, Selection, Quick, & Merge Sort)
-# ==== WRITE YOUR CODE HERE ====
+# Original list
+numbers = [45, 12, 78, 23, 9, 56]
+
+print("Original List:", numbers)
+
+
+# ===== BUBBLE SORT =====
+def bubble_sort(arr):
+    arr = arr.copy()
+
+    for i in range(len(arr)):
+        for j in range(len(arr) - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+
+    return arr
+
+
+# ===== INSERTION SORT =====
+def insertion_sort(arr):
+    arr = arr.copy()
+
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+
+        arr[j + 1] = key
+
+    return arr
+
+
+# ===== SELECTION SORT =====
+def selection_sort(arr):
+    arr = arr.copy()
+
+    for i in range(len(arr)):
+        minimum = i
+
+        for j in range(i + 1, len(arr)):
+            if arr[j] < arr[minimum]:
+                minimum = j
+
+        arr[i], arr[minimum] = arr[minimum], arr[i]
+
+    return arr
+
+
+# ===== QUICK SORT =====
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr.copy()
+
+    pivot = arr[len(arr) // 2]
+
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+
+    return quick_sort(left) + middle + quick_sort(right)
+
+
+# ===== MERGE SORT =====
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr.copy()
+
+    middle = len(arr) // 2
+
+    left = merge_sort(arr[:middle])
+    right = merge_sort(arr[middle:])
+
+    result = []
+
+    while left and right:
+        if left[0] < right[0]:
+            result.append(left.pop(0))
+        else:
+            result.append(right.pop(0))
+
+    return result + left + right
+
+
+# ===== DISPLAY RESULTS =====
+print("\\n=== SORTING RESULTS ===")
+
+print("Bubble Sort:   ", bubble_sort(numbers))
+print("Insertion Sort:", insertion_sort(numbers))
+print("Selection Sort:", selection_sort(numbers))
+print("Quick Sort:    ", quick_sort(numbers))
+print("Merge Sort:    ", merge_sort(numbers))
+
+
+# Time Complexity:
+# Bubble Sort: O(n^2)
+# Insertion Sort: O(n^2) worst
+# Selection Sort: O(n^2)
+# Quick Sort: O(n log n) average, O(n^2) worst
+# Merge Sort: O(n log n)
+
+# Space Complexity:
+# Bubble/Insertion/Selection: O(n) including copied input
+# Quick Sort: O(n) average auxiliary space
+# Merge Sort: O(n) auxiliary space
 `
             },
             9: {
                 title: "Searching Algorithms (Linear Search vs. Binary Search)",
                 code: `# Topic 9: Searching Algorithms (Linear Search vs. Binary Search)
-# ==== WRITE YOUR CODE HERE ====
+numbers = [10, 20, 30, 40, 50, 60, 70, 80]
+
+print("Available Numbers:", numbers)
+
+
+# ===== LINEAR SEARCH =====
+def linear_search(arr, target):
+    for index in range(len(arr)):
+        if arr[index] == target:
+            return index
+
+    return -1
+
+
+# ===== BINARY SEARCH =====
+def binary_search(arr, target):
+    low = 0
+    high = len(arr) - 1
+
+    while low <= high:
+        middle = (low + high) // 2
+
+        if arr[middle] == target:
+            return middle
+
+        elif arr[middle] < target:
+            low = middle + 1
+
+        else:
+            high = middle - 1
+
+    return -1
+
+
+# Search target
+target = 50
+
+linear_result = linear_search(numbers, target)
+binary_result = binary_search(numbers, target)
+
+print("\\n=== SEARCH RESULTS ===")
+
+if linear_result != -1:
+    print("Linear Search: Found at index", linear_result)
+else:
+    print("Linear Search: Not Found")
+
+if binary_result != -1:
+    print("Binary Search: Found at index", binary_result)
+else:
+    print("Binary Search: Not Found")
+
+
+# Search another number
+target = 100
+
+print("\\nSearching for:", target)
+print("Linear Search:", linear_search(numbers, target))
+print("Binary Search:", binary_search(numbers, target))
+
+
+# Time Complexity:
+# Linear Search: O(n)
+# Binary Search: O(log n)
+
+# Space Complexity:
+# Linear Search: O(1)
+# Binary Search: O(1)
+
+# Note: Binary Search requires sorted data.
 `
             },
             10: {
                 title: "Advanced Strategic Paradigms (Dijkstra's Algorithm & Greedy Patterns)",
                 code: `# Topic 10: Advanced Strategic Paradigms (Dijkstra's Algorithm & Greedy Patterns)
-# ==== WRITE YOUR CODE HERE ====
+# ===== GARDEN PATHS =====
+garden_paths = {
+    "House": [("Farm", 4), ("Well", 2)],
+    "Farm": [("House", 4), ("Greenhouse", 3)],
+    "Well": [("House", 2), ("Greenhouse", 5)],
+    "Greenhouse": [("Farm", 3), ("Well", 5), ("Storage", 2)],
+    "Storage": [("Greenhouse", 2)]
+}
+
+
+# ===== DIJKSTRA'S ALGORITHM =====
+def dijkstra(graph, start, destination):
+    distances = {node: float("inf") for node in graph}
+    previous = {}
+
+    distances[start] = 0
+
+    priority_queue = [(0, start)]
+
+    while priority_queue:
+        current_distance, current = heapq.heappop(priority_queue)
+
+        if current_distance > distances[current]:
+            continue
+
+        if current == destination:
+            break
+
+        for neighbor, weight in graph[current]:
+            new_distance = current_distance + weight
+
+            if new_distance < distances[neighbor]:
+                distances[neighbor] = new_distance
+                previous[neighbor] = current
+
+                heapq.heappush(
+                    priority_queue,
+                    (new_distance, neighbor)
+                )
+
+    if distances[destination] == float("inf"):
+        return None, float("inf")
+
+    # Reconstruct shortest path
+    path = []
+    current = destination
+
+    while current != start:
+        path.append(current)
+        current = previous[current]
+
+    path.append(start)
+    path.reverse()
+
+    return path, distances[destination]
+
+
+# ===== GREEDY PATTERN =====
+def choose_best_resource(resources):
+    best = max(resources, key=lambda item: item["value"])
+
+    return best
+
+
+# Find shortest garden route
+start = "House"
+destination = "Storage"
+
+path, distance = dijkstra(
+    garden_paths, start, destination
+)
+
+print("=== GARDEN NAVIGATION ===")
+
+if path:
+    print("Shortest Path:", " -> ".join(path))
+    print("Total Distance:", distance)
+else:
+    print("No available path.")
+
+
+# Choose the resource with the highest value
+resources = [
+    {"name": "Water", "value": 20},
+    {"name": "Seeds", "value": 50},
+    {"name": "Fertilizer", "value": 35}
+]
+
+best = choose_best_resource(resources)
+
+print("\\n=== GREEDY SELECTION ===")
+print("Best Resource:", best["name"])
+print("Resource Value:", best["value"])
+
+
+# Time Complexity:
+# Dijkstra with heap: O((V + E) log V)
+# Greedy selection: O(n)
+
+# Space Complexity:
+# Dijkstra: O(V + E)
+# Greedy selection: O(1) auxiliary space
 `
             },
             11: {
                 title: "Dynamic Programming (DP), Memoization, & Divide-and-Conquer",
                 code: `# Topic 11: Dynamic Programming (DP), Memoization, & Divide-and-Conquer
-# ==== WRITE YOUR CODE HERE ====
+# ===== MEMOIZATION =====
+memo = {}
+
+def fibonacci(n):
+    if n <= 1:
+        return n
+
+    if n in memo:
+        return memo[n]
+
+    memo[n] = fibonacci(n - 1) + fibonacci(n - 2)
+
+    return memo[n]
+
+
+# ===== DYNAMIC PROGRAMMING =====
+def fibonacci_dp(n):
+    if n <= 1:
+        return n
+
+    dp = [0] * (n + 1)
+
+    dp[0] = 0
+    dp[1] = 1
+
+    for i in range(2, n + 1):
+        dp[i] = dp[i - 1] + dp[i - 2]
+
+    return dp[n]
+
+
+# ===== DIVIDE AND CONQUER =====
+def sum_divide(arr):
+    if len(arr) == 0:
+        return 0
+
+    if len(arr) == 1:
+        return arr[0]
+
+    middle = len(arr) // 2
+
+    left = sum_divide(arr[:middle])
+    right = sum_divide(arr[middle:])
+
+    return left + right
+
+
+# ===== DISPLAY RESULTS =====
+number = 10
+
+print("=== FIBONACCI RESULTS ===")
+
+print("Using Memoization:", fibonacci(number))
+print("Using Dynamic Programming:", fibonacci_dp(number))
+
+print("\\n=== DIVIDE AND CONQUER ===")
+
+garden_numbers = [10, 20, 30, 40, 50]
+
+print("Garden Values:", garden_numbers)
+print("Total Sum:", sum_divide(garden_numbers))
+
+
+# Time Complexity:
+# Fibonacci Memoization: O(n)
+# Fibonacci DP: O(n)
+# Divide-and-Conquer Sum: O(n)
+
+# Space Complexity:
+# Memoization: O(n)
+# DP: O(n)
+# Divide-and-Conquer Sum: O(log n) auxiliary space
 `
             },
             12: {
                 title: "Resource Storage and Seed Bank",
                 code: `# Topic 12: Additional Module
-# ==== WRITE YOUR CODE HERE ====
+# ===== RESOURCE STORAGE =====
+class ResourceStorage:
+    def __init__(self):
+        self.resources = {
+            "water": 0,
+            "fertilizer": 0,
+            "wood": 0,
+            "food": 0
+        }
+
+        self.capacity = 200
+
+    # Add resource
+    def add_resource(self, name, amount):
+        if name not in self.resources or amount <= 0:
+            print("Invalid resource or amount.")
+            return
+
+        if sum(self.resources.values()) + amount > self.capacity:
+            print("Storage is full!")
+            return
+
+        self.resources[name] += amount
+        print(f"Added {amount} {name}.")
+
+    # Use resource
+    def use_resource(self, name, amount):
+        if name not in self.resources or amount <= 0:
+            print("Invalid resource or amount.")
+            return
+
+        if self.resources[name] >= amount:
+            self.resources[name] -= amount
+            print(f"Used {amount} {name}.")
+        else:
+            print(f"Not enough {name}!")
+
+    # Display resources
+    def show_resources(self):
+        print("\\n=== RESOURCE STORAGE ===")
+
+        for name, amount in self.resources.items():
+            print(f"{name.title()}: {amount}")
+
+        total = sum(self.resources.values())
+        print("Total Storage:", total, "/", self.capacity)
+
+
+# ===== SEED BANK =====
+class SeedBank:
+    def __init__(self):
+        self.seeds = {
+            "tomato": 0,
+            "carrot": 0,
+            "corn": 0,
+            "lettuce": 0
+        }
+
+        self.capacity = 100
+
+    # Add seeds
+    def add_seed(self, name, amount):
+        if name not in self.seeds or amount <= 0:
+            print("Invalid seed or amount.")
+            return
+
+        if sum(self.seeds.values()) + amount > self.capacity:
+            print("Seed bank is full!")
+            return
+
+        self.seeds[name] += amount
+        print(f"Added {amount} {name} seeds.")
+
+    # Plant seeds
+    def plant_seed(self, name, amount):
+        if name not in self.seeds or amount <= 0:
+            print("Invalid seed or amount.")
+            return
+
+        if self.seeds[name] >= amount:
+            self.seeds[name] -= amount
+            print(f"Successfully planted {amount} {name} seeds!")
+        else:
+            print(f"Not enough {name} seeds!")
+
+    # Display seeds
+    def show_seeds(self):
+        print("\\n=== SEED BANK ===")
+
+        for name, amount in self.seeds.items():
+            print(f"{name.title()} Seeds: {amount}")
+
+        total = sum(self.seeds.values())
+        print("Total Seeds:", total, "/", self.capacity)
+
+
+# ===== GARDEN SIMULATION =====
+
+storage = ResourceStorage()
+seed_bank = SeedBank()
+
+print("=== GARDEN RESOURCE MANAGEMENT ===")
+
+# Add resources
+storage.add_resource("water", 50)
+storage.add_resource("fertilizer", 20)
+storage.add_resource("wood", 30)
+storage.add_resource("food", 15)
+
+# Use resources
+storage.use_resource("water", 10)
+storage.use_resource("fertilizer", 5)
+
+# Add seeds
+seed_bank.add_seed("tomato", 20)
+seed_bank.add_seed("carrot", 15)
+seed_bank.add_seed("corn", 10)
+seed_bank.add_seed("lettuce", 12)
+
+# Plant seeds
+seed_bank.plant_seed("tomato", 5)
+seed_bank.plant_seed("corn", 3)
+
+# Display final inventory
+print("\\n=== FINAL GARDEN INVENTORY ===")
+
+storage.show_resources()
+seed_bank.show_seeds()
+
+
+# Time Complexity:
+# Add Resource: O(1) average
+# Use Resource: O(1) average
+# Add Seed: O(1) average
+# Plant Seed: O(1) average
+# Display Inventory: O(n)
+
+# Space Complexity:
+# Resource Storage: O(n)
+# Seed Bank: O(n)
 `
             }
         };
